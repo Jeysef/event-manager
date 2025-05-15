@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Event manager
+
+An interview project by Lakmoos from 14.05.2025 - 18.05.2025
+
+## Description
+
+Create a full-stack CRUD application for managing events. The application should have a REST API backend and a frontend built with a modern JavaScript framework, preferably React.
+
+## My take
+
+I chose NextJs for Frontend and backend. I will be using api routes instead of server functions.
+I plan to use: 
+    - Shadcn ui
+    - TanStack Query 
+    - Tanstack Form
+For database I chose Neon, hosted on Vercel.
+I plant to host this project on vercel as well.
 
 ## Getting Started
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+To initialize the db, type the following into SQL editor:
+```sql
+-- Create your events table if it doesn't exist
+CREATE TABLE IF NOT EXISTS events (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT,
+  "from" TIMESTAMP NOT NULL,
+  "to" TIMESTAMP NOT NULL
+);
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+To Insert few entries use: 
+```sql
+-- Insert your 5 events
+INSERT INTO events (name, description, "from", "to") VALUES
+  (
+    'SolidJS Meetup Brno',
+    'Meet other SolidJS enthusiasts and share your projects.',
+    '2025-06-01 18:00:00',
+    '2025-06-01 21:00:00'
+  ),
+  (
+    'TypeScript Bootcamp',
+    'A hands-on bootcamp for mastering TypeScript.',
+    '2025-06-10 09:00:00',
+    '2025-06-10 17:00:00'
+  ),
+  (
+    'Frontend Friday',
+    'Weekly frontend dev discussions and lightning talks.',
+    '2025-06-13 16:00:00',
+    '2025-06-13 19:00:00'
+  ),
+  (
+    'Open Source Hackathon',
+    'Collaborate and contribute to open source projects.',
+    '2025-06-20 10:00:00',
+    '2025-06-20 22:00:00'
+  ),
+  (
+    'Summer Tech BBQ',
+    'Networking, food, and tech talks in the park.',
+    '2025-06-28 15:00:00',
+    '2025-06-28 20:00:00'
+  );
+```
