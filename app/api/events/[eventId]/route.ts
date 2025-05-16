@@ -1,4 +1,5 @@
 import { deleteEvent, getEvent, updateEvent } from "@/lib/db";
+import { FormEventSchema } from "@/lib/schema";
 
 // GET /api/event/[eventId]
 export async function GET(_: Request, { params }: { params: Promise<{ eventId: string }> }) {
@@ -12,10 +13,14 @@ export async function GET(_: Request, { params }: { params: Promise<{ eventId: s
 export async function PATCH(request: Request, { params }: { params: Promise<{ eventId: string }> }) {
   const { eventId } = await params;
   const eventData = await request.json();
-  // TODO: Validate eventData
-  eventData.from = new Date(eventData.from);
-  eventData.to = new Date(eventData.to);
-  const updatedEvent = await updateEvent(Number(eventId), eventData);
+  // Validate eventData using Zod
+  const parsed = FormEventSchema.safeParse(eventData);
+  if (!parsed.success) {
+    return Response.json({ errors: parsed.error.flatten() }, { status: 400 });
+  }
+  // Zod already coerces dates, but ensure Date objects
+  const validData = parsed.data;
+  const updatedEvent = await updateEvent(Number(eventId), validData);
   return Response.json(updatedEvent);
 }
 

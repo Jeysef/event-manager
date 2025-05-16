@@ -1,4 +1,5 @@
 import { createEvent, getEvents } from "@/lib/db";
+import { FormEventSchema } from "@/lib/schema";
 
 // GET /api/events
 export async function GET(request: Request) {
@@ -19,9 +20,13 @@ export async function GET(request: Request) {
 // POST /api/events
 export async function POST(request: Request) {
   const eventData = await request.json();
-  // TODO: Validate eventData
-  eventData.from = new Date(eventData.from);
-  eventData.to = new Date(eventData.to);
-  const newEvent = await createEvent(eventData);
+  // Validate eventData using Zod
+  const parsed = FormEventSchema.safeParse(eventData);
+  if (!parsed.success) {
+    return Response.json({ errors: parsed.error.flatten() }, { status: 400 });
+  }
+  // Zod already coerces dates, but ensure Date objects
+  const validData = parsed.data;
+  const newEvent = await createEvent(validData);
   return Response.json(newEvent, { status: 201 });
 }
