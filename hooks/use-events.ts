@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { eventsApi } from "../api";
+import { useSearch } from "./use-search";
 
 export function useEvents(params?: Parameters<typeof eventsApi.getEvents>[0]) {
   return useQuery({
@@ -19,5 +20,16 @@ export function useUpdateEvent(id: string, params: Parameters<typeof eventsApi.u
   return useQuery({
     queryKey: ["updateEvent", id, params],
     queryFn: () => eventsApi.updateEvent(id, params),
+  });
+}
+
+export function useSearchedEvents() {
+  const { search, startDate, endDate } = useSearch();
+
+  
+  return useEvents({
+    search,
+    startDate: startDate ?? undefined,
+    endDate: endDate ?? undefined,
   });
 }

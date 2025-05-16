@@ -1,10 +1,10 @@
 "use client";
 
 import { EventCard } from "@/components/compositions/event-card";
-import { useEvents } from "@/hooks/use-events";
+import { useSearchedEvents } from "@/hooks/use-events";
 
 export default function EventsPage() {
-  const { data: events, isLoading, error } = useEvents();
+  const { data: events, isLoading, error } = useSearchedEvents();
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
