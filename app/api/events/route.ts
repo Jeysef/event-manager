@@ -19,6 +19,9 @@ export async function GET(request: Request) {
 // POST /api/events
 export async function POST(request: Request) {
   const eventData = await request.json();
+  // TODO: Validate eventData
+  eventData.from = new Date(eventData.from);
+  eventData.to = new Date(eventData.to);
   const newEvent = await createEvent(eventData);
   return Response.json(newEvent, { status: 201 });
 }

@@ -22,12 +22,9 @@ export function useEvent(id: string) {
   });
 }
 
-export function useCreateEvent(params: Parameters<typeof eventsApi.createEvent>[0]) {
-  return useQuery({
-    queryKey: ["createEvent", params],
-    queryFn: () => eventsApi.createEvent(params),
-  });
-}
+export const createEventMutationFn = (params: Parameters<typeof eventsApi.createEvent>[0]) => {
+  return eventsApi.createEvent(params);
+};
 
 export const updateEventMutationFn = ({ id, params }: { id: string, params: Parameters<typeof eventsApi.updateEvent>[1] }) => {
   return eventsApi.updateEvent(id, params);

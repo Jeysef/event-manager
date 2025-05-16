@@ -26,7 +26,9 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { NavUser } from "./nav-user"
-import { Button } from "../ui/button"
+import { buttonVariants } from "../ui/button"
+import Link from "next/link"
+import { cn } from "@/lib/utils"
 
 const data = {
   user: {
@@ -161,9 +163,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <Button size="lg" className="w-full">
+            <Link className={cn(buttonVariants({size: "lg"}), "w-full")} href="/event">
               Add event
-            </Button>
+            </Link>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
