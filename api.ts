@@ -26,7 +26,7 @@ export const eventsApi = {
   },
 
   updateEvent: async (id: string, eventData: Partial<Event>): Promise<Event> => {
-    const { data } = await api.patch(`/events/${id}`, eventData);
+    const { data } = await api.put(`/events/${id}`, eventData);
     return data;
   },
 

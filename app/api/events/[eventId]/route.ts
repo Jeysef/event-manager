@@ -9,8 +9,8 @@ export async function GET(_: Request, { params }: { params: Promise<{ eventId: s
   return Response.json(event);
 }
 
-// PATCH /api/event/[eventId]
-export async function PATCH(request: Request, { params }: { params: Promise<{ eventId: string }> }) {
+// PUT /api/event/[eventId]
+export async function PUT(request: Request, { params }: { params: Promise<{ eventId: string }> }) {
   const { eventId } = await params;
   const eventData = await request.json();
   // Validate eventData using Zod
