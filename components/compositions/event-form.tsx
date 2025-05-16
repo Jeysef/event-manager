@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useForm } from "@tanstack/react-form"
@@ -15,6 +15,7 @@ import { TimePicker } from "../ui/time-picker"
 import Link from "next/link"
 import { DatePicker } from "../ui/date-picker"
 import { useRouter } from "next/navigation"
+import { FormEvent, FormEventSchema } from "@/lib/schema"
 
 export default function EventForm() {
   const router = useRouter()
@@ -22,10 +23,25 @@ export default function EventForm() {
 
   const now = new Date()
   const pad = (n: number) => n.toString().padStart(2, "0")
-  const [fromDate, setFromDate] = useState<Date | undefined>(now)
-  const [toDate, setToDate] = useState<Date | undefined>(now)
+  const [fromDate, setFromDate] = useState<Date>(now)
+  const [toDate, setToDate] = useState<Date>(now)
   const [fromTime, setFromTime] = useState<string>(`${pad(now.getHours())}:00`)
   const [toTime, setToTime] = useState<string>(`${pad(now.getHours() + 1)}:00`)
+
+  const from = useMemo(() => {
+    const date = new Date(fromDate)
+    const [hours, minutes] = fromTime.split(":").map(Number)
+    date.setHours(hours, minutes)
+    return date
+  }, [fromDate, fromTime])
+
+  const to = useMemo(() => {
+    const date = new Date(toDate)
+    const [hours, minutes] = toTime.split(":").map(Number)
+    date.setHours(hours, minutes)
+    return date
+  }, [toDate, toTime])
+
 
 
   const { mutate: createEvent, isPending: isCreating } = useMutation({
@@ -62,10 +78,10 @@ export default function EventForm() {
   const form = useForm({
     defaultValues: {
       name: "",
-      description: "",
-      from: "",
-      to: "",
-    },
+      description: null,
+      from: from,
+      to: to,
+    } as FormEvent,
     onSubmit: async ({ value }) => {
       createEvent({
         name: value.name,
@@ -74,31 +90,45 @@ export default function EventForm() {
         to: new Date(value.to),
       })
     },
+    validators: {
+      onMount: ({ value }) => {
+        const errors = FormEventSchema.shape.name.safeParse(value.name)
+        if (!errors.success) {
+          return errors.error.issues.map((issue) => issue.message).join(", ")
+        }
+        return undefined
+      },
+    },
   })
 
-  // Update form values when date/time changes
   useEffect(() => {
-    if (fromDate) {
-      const fromDateTime = new Date(fromDate)
-      const [hours, minutes] = fromTime.split(":").map(Number)
-      fromDateTime.setHours(hours, minutes)
-      form.setFieldValue("from", fromDateTime.toISOString())
-    }
-
-    if (toDate) {
-      const toDateTime = new Date(toDate)
-      const [hours, minutes] = toTime.split(":").map(Number)
-      toDateTime.setHours(hours, minutes)
-      form.setFieldValue("to", toDateTime.toISOString())
-    }
-  }, [fromDate, toDate, fromTime, toTime, form])
+    form.setFieldValue("from", from)
+    form.setFieldValue("to", to)
+  }, [from, to, form])
 
   return (
     <div className="max-w-md mx-auto w-full h-full content-center">
       <Card className="border-0 shadow-none">
         <CardContent className="p-0 space-y-4">
           <div className="border-b pb-3">
-            <form.Field name="name">
+            <form.Field name="name"
+              validators={{
+                onChange: ({ value }) => {
+                  const errors = FormEventSchema.shape.name.safeParse(value)
+                  if (!errors.success) {
+                    return errors.error.issues.map((issue) => issue.message).join(", ")
+                  }
+                  return undefined
+                },
+                onMount: ({ value }) => {
+                  const errors = FormEventSchema.shape.name.safeParse(value)
+                  if (!errors.success) {
+                    return errors.error.issues.map((issue) => issue.message).join(", ")
+                  }
+                  return undefined
+                }
+              }}
+            >
               {(field) => (
                 <div className="space-y-2">
                   <Label htmlFor="event-name">Event Name</Label>
@@ -109,6 +139,11 @@ export default function EventForm() {
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
+                  {field.state.meta.errorMap['onChange'] && (
+                    <em className="text-red-500 text-xs" role="alert">
+                      {field.state.meta.errorMap['onChange']}
+                    </em>
+                  )}
                 </div>
               )}
             </form.Field>
