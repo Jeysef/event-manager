@@ -57,6 +57,11 @@ export async function getEvents(filters?: {
   return query.where(conditions.length > 0 ? and(...conditions) : undefined);
 }
 
+export async function getEvent(id: number) {
+  const [event] = await db.select().from(events).where(eq(events.id, id));
+  return event;
+}
+
 // UPDATE
 export async function updateEvent(id: number, eventData: Partial<Event>) {
   const [event] = await db

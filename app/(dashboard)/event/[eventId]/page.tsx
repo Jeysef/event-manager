@@ -1,11 +1,14 @@
+'use client'
 
-export default function EventDetail(props: any) {
-console.log("🚀 ~ EventDetail ~ props:", props)
+import { use } from 'react'
+import EventDetail from '@/components/compositions/event-detail'
 
 
-   return (
-      <div>
-        Hello event
-      </div>
-  );
+export default function EventPage({ params }: { params: Promise<{ eventId: string }> }) {
+  const { eventId } = use(params)
+
+  return (
+
+    <EventDetail eventId={eventId} />
+  )
 }

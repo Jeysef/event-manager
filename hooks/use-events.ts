@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { eventsApi } from "../api";
 import { useSearch } from "./use-search";
 
@@ -9,6 +9,19 @@ export function useEvents(params?: Parameters<typeof eventsApi.getEvents>[0]) {
   });
 }
 
+export function useEvent(id: string) {
+  const queryClient = useQueryClient();
+  return useQuery({
+    queryKey: ["event", id],
+    queryFn: () => eventsApi.getEvent(id),
+    initialData: () => {
+      // Try to get the event from the cached events list
+      const events = queryClient.getQueryData<any[]>(["events", {}]);
+      return events?.find((event) => String(event.id) === String(id));
+    },
+  });
+}
+
 export function useCreateEvent(params: Parameters<typeof eventsApi.createEvent>[0]) {
   return useQuery({
     queryKey: ["createEvent", params],
@@ -16,19 +29,19 @@ export function useCreateEvent(params: Parameters<typeof eventsApi.createEvent>[
   });
 }
 
-export function useUpdateEvent(id: string, params: Parameters<typeof eventsApi.updateEvent>[1]) {
-  return useQuery({
-    queryKey: ["updateEvent", id, params],
-    queryFn: () => eventsApi.updateEvent(id, params),
-  });
-}
+export const updateEventMutationFn = ({ id, params }: { id: string, params: Parameters<typeof eventsApi.updateEvent>[1] }) => {
+  return eventsApi.updateEvent(id, params);
+};
+
+export const deleteEventMutationFn = (id: string) => {
+  return eventsApi.deleteEvent(id);
+};
 
 export function useSearchedEvents() {
   const { search, startDate, endDate } = useSearch();
 
-  
   return useEvents({
-    search,
+    search: search || undefined,
     startDate: startDate ?? undefined,
     endDate: endDate ?? undefined,
   });
