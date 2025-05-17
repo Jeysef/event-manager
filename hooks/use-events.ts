@@ -40,13 +40,14 @@ export const deleteEventMutationFn = (id: string) => {
   return eventsApi.deleteEvent(id);
 };
 
-export function useSearchedEvents() {
+export function useSearchedEvents(params?: Parameters<typeof eventsApi.getEvents>[0]) {
   const { search, startDate, endDate } = useSearch();
 
 
   return useEvents({
     search: search || undefined,
-    startDate: startDate ?? startOfToday(),
+    startDate: startDate ?? undefined,
     endDate: endDate ?? undefined,
+    ...params,
   });
 }
