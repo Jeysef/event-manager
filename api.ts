@@ -34,3 +34,10 @@ export const eventsApi = {
     await api.delete(`/events/${id}`);
   },
 };
+
+export const analyticsApi = {
+  getEventsCount: async (): Promise<{ count: number }> => {
+    const {data } = await api.get("/analytics/events");
+    return data;
+  }
+};

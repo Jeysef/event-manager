@@ -1,6 +1,7 @@
 import 'server-only';
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
+import { count } from 'drizzle-orm';
 import {
   pgTable,
   text,
@@ -60,6 +61,12 @@ export async function getEvents(filters?: {
 export async function getEvent(id: number) {
   const [event] = await db.select().from(events).where(eq(events.id, id));
   return event;
+}
+
+// COUNT
+export async function getEventsCount() {
+  const [result] = await db.select({ count: count(events.id) }).from(events);
+  return result;
 }
 
 // UPDATE
