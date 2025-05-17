@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useMemo, useState } from "react"
+import React, { } from "react"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useForm } from "@tanstack/react-form"
@@ -16,6 +16,8 @@ import Link from "next/link"
 import { DatePicker } from "../ui/date-picker"
 import { useRouter } from "next/navigation"
 import { FormEvent, FormEventSchema } from "@/lib/schema"
+import { addHours } from "date-fns"
+import { ArrowRight } from "lucide-react"
 
 export default function EventForm() {
   const router = useRouter()
@@ -23,38 +25,11 @@ export default function EventForm() {
 
   const now = new Date()
   const pad = (n: number) => n.toString().padStart(2, "0")
-  const [fromDate, setFromDate] = useState<Date>(now)
-  const [toDate, setToDate] = useState<Date>(now)
-  const [fromTime, setFromTime] = useState<string>(`${pad(now.getHours())}:00`)
-  const [toTime, setToTime] = useState<string>(`${pad(now.getHours() + 1)}:00`)
 
-  const handleSetFromDate = (date: Date) => {
-    setFromDate(date)
-    if (date > toDate) {
-      setToDate(date)
-    }
+  const parseTime = (time: string) => {
+    const [hours, minutes] = time.split(":").map(Number)
+    return { hours, minutes }
   }
-  const handleSetToDate = (date: Date) => {
-    setToDate(date)
-    if (date < fromDate) {
-      setFromDate(date)
-    }
-  }
-  const from = useMemo(() => {
-    const date = new Date(fromDate)
-    const [hours, minutes] = fromTime.split(":").map(Number)
-    date.setHours(hours, minutes)
-    return date
-  }, [fromDate, fromTime])
-
-  const to = useMemo(() => {
-    const date = new Date(toDate)
-    const [hours, minutes] = toTime.split(":").map(Number)
-    date.setHours(hours, minutes)
-    return date
-  }, [toDate, toTime])
-
-
 
   const { mutate: createEvent, isPending: isCreating } = useMutation({
     mutationFn: createEventMutationFn,
@@ -91,15 +66,24 @@ export default function EventForm() {
     defaultValues: {
       name: "",
       description: null,
-      from: from,
-      to: to,
+      fromDate: now,
+      fromTime: `${pad(now.getHours())}:00`,
+      toDate: addHours(now, 1),
+      toTime: `${pad(now.getHours() + 1)}:00`,
     } as FormEvent,
     onSubmit: async ({ value }) => {
+      const from = new Date(value.fromDate)
+      const { hours: fromHours, minutes: fromMinutes } = parseTime(value.fromTime)
+      from.setHours(fromHours, fromMinutes)
+      const to = new Date(value.toDate)
+      const { hours: toHours, minutes: toMinutes } = parseTime(value.toTime)
+      to.setHours(toHours, toMinutes)
+
       createEvent({
         name: value.name,
         description: value.description,
-        from: new Date(value.from),
-        to: new Date(value.to),
+        from,
+        to,
       })
     },
     validators: {
@@ -110,13 +94,23 @@ export default function EventForm() {
         }
         return undefined
       },
+      onChange: ({ value }) => {
+        const errorsFrom = FormEventSchema.shape.fromTime.safeParse(value.fromTime)
+        if (!errorsFrom.success) {
+          return errorsFrom.error.issues.map((issue) => issue.message).join(", ")
+        }
+        const errorsTo = FormEventSchema.shape.toTime.safeParse(value.toTime)
+        if (!errorsTo.success) {
+          return errorsTo.error.issues.map((issue) => issue.message).join(", ")
+        }
+        const { hours: fromHours, minutes: fromMinutes } = parseTime(value.fromTime)
+        const { hours: toHours, minutes: toMinutes } = parseTime(value.toTime)
+        if (fromHours > toHours || (fromHours === toHours && fromMinutes > toMinutes)) {
+          return "Start time must be before end time"
+        }
+      }
     },
   })
-
-  useEffect(() => {
-    form.setFieldValue("from", from)
-    form.setFieldValue("to", to)
-  }, [from, to, form])
 
   return (
     <div className="max-w-md mx-auto w-full h-full content-center">
@@ -178,17 +172,56 @@ export default function EventForm() {
 
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <DatePicker date={fromDate} setDate={handleSetFromDate} />
-              <TimePicker value={fromTime} onChange={setFromTime} />
+              <form.Field name="fromDate">
+                {(field) => (
+                  <DatePicker date={field.state.value} setDate={(date) => {
+                    const toDate = field.form.getFieldValue("toDate")
+                    if (date > toDate) {
+                      form.setFieldValue("toDate", date)
+                    }
+                    field.handleChange(date)
+                  }} />
+                )}
+              </form.Field>
+              <form.Field name="fromTime">
+                {(field) => (
+                  <TimePicker value={field.state.value} onChange={field.handleChange} />
+                )}
+              </form.Field>
             </div>
 
-            <div className="text-gray-400">→</div>
+            <div className="text-gray-400"><ArrowRight width={16} /></div>
 
             <div className="space-y-1">
-              <DatePicker date={toDate} setDate={handleSetToDate} />
-              <TimePicker value={toTime} onChange={setToTime} />
+              <form.Field name="toDate">
+                {(field) => (
+                  <DatePicker date={field.state.value} setDate={(date) => {
+                    const fromDate = field.form.getFieldValue("fromDate")
+                    if (date < fromDate) {
+                      form.setFieldValue("fromDate", date)
+                    }
+                    field.handleChange(date)
+                  }} />
+                )}
+              </form.Field>
+              <form.Field name="toTime">
+                {(field) => (
+                  <TimePicker value={field.state.value} onChange={field.handleChange} />
+                )}
+              </form.Field>
             </div>
           </div>
+          <form.Subscribe selector={(state) => state.errorMap}>
+            {(formErrorMap) => (
+              <>
+                {formErrorMap['onChange'] && (
+                  <em className="text-red-500 text-xs" role="alert">
+                    {formErrorMap['onChange']}
+                  </em>
+                )}
+              </>
+            )}
+          </form.Subscribe>
 
           <div className="flex justify-end pt-4 gap-x-4">
             <form.Subscribe selector={(state) => state}>
