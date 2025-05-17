@@ -4,6 +4,7 @@ import "./globals.css";
 import ReactQueryProvider from "@/components/providers/react-query-provider";
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { Toaster } from "@/components/ui/sonner";
+import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,7 +33,9 @@ export default function RootLayout({
       >
         <NuqsAdapter>
           <ReactQueryProvider>
-            {children}
+            <Suspense>
+              {children}
+            </Suspense>
             <Toaster />
           </ReactQueryProvider>
         </NuqsAdapter>
