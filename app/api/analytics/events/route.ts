@@ -1,8 +1,8 @@
-import { getEventsCount } from "@/lib/db";
+import { getMonthlyEventsCounts } from "@/lib/db";
 
 // GET /api/events/count
 export async function GET() {
-  const events = await getEventsCount()
-  console.log("🚀 ~ GET ~ events:", events)
+  const events = await getMonthlyEventsCounts()
+
   return Response.json(events);
 }

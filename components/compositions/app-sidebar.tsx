@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import {
+  ChartBarBig,
   Home,
   List,
   Plus,
@@ -9,7 +10,6 @@ import {
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -18,7 +18,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { Analytics } from "./analytics"
 import Link from "next/link"
 
 const data = {
@@ -39,6 +38,11 @@ const data = {
       title: "Events",
       url: "/events",
       icon: List,
+    },
+    {
+      title: "Analytics",
+      url: "/analytics",
+      icon: ChartBarBig,
     },
   ]
 }
@@ -87,9 +91,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-        <Analytics />
-      </SidebarFooter>
     </Sidebar>
   )
 }

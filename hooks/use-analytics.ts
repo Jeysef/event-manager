@@ -1,11 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { analyticsApi } from "../api";
 
-export function useEventsCount() {
-  console.log("🚀 ~ useEventsCount ~ useEventsCount:", analyticsApi.getEventsCount)
+export function useAnalytics() {
   return useQuery({
-    queryKey: ["eventsCount"],
-    queryFn: () => analyticsApi.getEventsCount(),
+    queryKey: ["analytics"],
+    queryFn: () => analyticsApi.getEventsAnalytics(),
     staleTime: 1000, // 1 second
   });
 }

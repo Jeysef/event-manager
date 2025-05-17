@@ -36,7 +36,7 @@ export const eventsApi = {
 };
 
 export const analyticsApi = {
-  getEventsCount: async (): Promise<{ count: number }> => {
+  getEventsAnalytics: async (): Promise<{ count: number, year: string, month: string }[]> => {
     const {data } = await api.get("/analytics/events");
     return data;
   }
