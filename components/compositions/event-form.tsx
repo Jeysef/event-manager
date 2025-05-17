@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation"
 import { FormEvent, FormEventSchema } from "@/lib/schema"
 import { addHours } from "date-fns"
 import { ArrowRight } from "lucide-react"
+import { toast } from "sonner"
 
 export default function EventForm() {
   const router = useRouter()
@@ -54,6 +55,7 @@ export default function EventForm() {
       if (context?.previousEvents) {
         queryClient.setQueryData(["events"], context.previousEvents)
       }
+      toast.error("Error creating event")
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ["events"] }),
     onSuccess: () => {
