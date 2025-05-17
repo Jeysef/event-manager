@@ -59,27 +59,6 @@ function EventDetail({ eventId }: { eventId: string }) {
     },
   });
 
-  const form = useForm({
-    defaultValues: {
-      name: event?.name || '',
-      description: event?.description || '',
-      from: event?.from ? format(event.from, "yyyy-MM-dd'T'HH:mm") : '',
-      to: event?.to ? format(event.to, "yyyy-MM-dd'T'HH:mm") : ''
-    },
-    onSubmit: async ({ value }) => {
-      if (!event) return
-
-      updateEvent({
-        id: `${event.id}`,
-        params: {
-          name: value.name,
-          description: value.description,
-          from: new Date(value.from),
-          to: new Date(value.to)
-        }
-      })
-    }
-  })
 
 
   const EventDetailSkeleton = () => (
