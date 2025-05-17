@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { endOfMonth, format, isSameDay, isSameMonth, startOfMonth } from "date-fns"
+import { endOfMonth, format, isSameDay, isSameMonth, startOfMonth, addDays, startOfDay, endOfDay, areIntervalsOverlapping, differenceInMinutes } from "date-fns"
 import { useEvents } from "@/hooks/use-events"
 import { EventCard } from "./event-card"
 import { Calendar } from "../ui/calendar"
@@ -24,34 +24,48 @@ export default function Homepage() {
     endDate: monthEnd,
   })
 
-  // Create a map of dates that have events
   const datesWithEvents = useMemo(() => {
-    if (!events) return new Map()
+    const map = new Map<string, any[]>()
+    if (!events) return map
 
-    const dateMap = new Map()
-    events.forEach((event) => {
-      const eventDate = new Date(event.from)
-      const dateKey = format(eventDate, "yyyy-MM-dd")
+    let currentDay = startOfDay(monthStart)
+    const endDay = startOfDay(monthEnd)
 
-      if (!dateMap.has(dateKey)) {
-        dateMap.set(dateKey, [])
+    while (currentDay <= endDay) {
+      const dayStart = currentDay
+      const dayEnd = endOfDay(currentDay)
+
+      if (events) {
+        events.forEach(event => {
+          const eventStart = new Date(event.from)
+          const eventEnd = new Date(event.to)
+          if (
+            areIntervalsOverlapping(
+              { start: eventStart, end: eventEnd },
+              { start: dayStart, end: dayEnd }
+            )
+          ) {
+            const key = format(dayStart, "yyyy-MM-dd")
+            if (!map.has(key)) map.set(key, [])
+            map.get(key)!.push(event)
+          }
+        })
       }
-      dateMap.get(dateKey).push(event)
-    })
 
-    return dateMap
-  }, [events])
+      currentDay = addDays(currentDay, 1)
+    }
 
-  // Get events for the selected day
+    return map
+  }, [events, monthStart, monthEnd])
+
+  // Events for the currently selected day
   const selectedDayEvents = useMemo(() => {
     if (!events) return []
-
-    return events
-      .filter((event) => isSameDay(new Date(event.from), selectedDate))
-      .sort((a, b) => new Date(a.from).getTime() - new Date(b.from).getTime())
-  }, [events, selectedDate])
-
-  // Function to navigate to previous/next month
+    const key = format(selectedDate, "yyyy-MM-dd")
+    return (datesWithEvents.get(key) || []).slice().sort(
+      (a, b) => differenceInMinutes(new Date(a.from), new Date(b.from))
+    )
+  }, [datesWithEvents, selectedDate, events])
 
 
   const dayHasEvents = (day: Date) => {
