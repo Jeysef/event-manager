@@ -9,6 +9,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "../ui
 import { Button, buttonVariants } from "../ui/button"
 import { EventCardSkeleton } from "./event-card-skeleton"
 import Link from "next/link"
+import { cn } from "@/lib/utils"
 
 export default function Homepage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
@@ -102,23 +103,20 @@ export default function Homepage() {
                   head_cell: "w-full text-muted-foreground rounded-md font-normal text-sm",
                   row: "flex w-full mt-6 justify-around",
                   cell: "relative p-0 text-center text-sm focus-within:relative focus-within:z-20 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md",
-                  day: "h-12 w-12 p-0 font-normal aria-selected:opacity-100 hover:bg-accent hover:text-accent-foreground rounded-md",
+                  day: "h-12 w-12 p-0 font-normal aria-selected:opacity-100 hover:bg-accent hover:text-accent-foreground rounded-md bg-indigo-100",
                   day_selected:
-                    "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                    "text-primary-foreground  hover:text-primary-foreground focus:text-primary-foreground ring-4 ring-primary bg-indigo-100 text-primary-foreground",
                   day_today: "bg-accent text-accent-foreground",
                   day_outside:
-                    "day-outside text-muted-foreground aria-selected:bg-accent/50 aria-selected:text-muted-foreground opacity-50",
+                    "day-outside text-muted-foreground aria-selected:bg-accent/50 aria-selected:text-muted-foreground opacity-50 !bg-gray-300",
                   day_disabled: "text-muted-foreground opacity-50",
                   day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
                   day_hidden: "invisible",
                 }}
                 components={{
                   DayContent: ({ date }) => (
-                    <div className="relative flex h-12 w-12 items-center justify-center p-0">
-                      <span>{date.getDate()}</span>
-                      {dayHasEvents(date) && (
-                        <div className="absolute bottom-2 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-primary" />
-                      )}
+                    <div className={cn("relative flex h-12 w-12 items-center justify-center p-0 rounded-md", {"bg-indigo-300": dayHasEvents(date)})}>
+                      <span className="font-semibold text-indigo-900">{date.getDate()}</span>
                     </div>
                   ),
                 }}

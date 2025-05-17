@@ -18,7 +18,7 @@ function Calendar({
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{
-        months: "flex flex-col sm:flex-row gap-2",
+        months: "flex flex-col sm:flex-row gap-6",
         month: "flex flex-col gap-4",
         caption: "flex justify-center pt-1 relative items-center w-full",
         caption_label: "text-sm font-medium",
@@ -41,8 +41,8 @@ function Calendar({
             : "[&:has([aria-selected])]:rounded-md"
         ),
         day: cn(
-          buttonVariants({ variant: "ghost" }),
-          "size-8 p-0 font-normal aria-selected:opacity-100"
+          buttonVariants({ variant: "ghost", className: "" }),
+          "m-0.5  size-8 p-0 font-normal aria-selected:opacity-100"
         ),
         day_range_start:
           "day-range-start aria-selected:bg-primary aria-selected:text-primary-foreground",

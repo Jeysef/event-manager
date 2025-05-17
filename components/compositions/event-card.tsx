@@ -22,7 +22,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
   return (
     <Link className='contents' href={`/event/${event.id}`}>
       <Card
-        className="mb-2 hover:bg-slate-50 transition-colors py-2 relative flex-row items-center"
+        className="mb-2 bg-indigo-100 hover:bg-indigo-200 transition-colors py-2 relative flex-row items-center"
       >
         <div className='flex-col flex-1'>
           <CardHeader className="p-4 pb-2">

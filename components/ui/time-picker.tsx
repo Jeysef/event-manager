@@ -19,7 +19,7 @@ export function TimePicker({ value, onChange, className }: TimePickerProps) {
           type="time"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none"
+          className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none bg-indigo-50"
         />
       </div>
     </div>

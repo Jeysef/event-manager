@@ -125,7 +125,7 @@ export function EventForm({
                   <Label htmlFor="event-name">Event Name</Label>
                   <Input
                     id="event-name"
-                    className="border-b focus-visible:ring-0 focus-visible:ring-offset-0"
+                    className="border-b focus-visible:ring-0 focus-visible:ring-offset-0 bg-indigo-50"
                     placeholder="Title"
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
@@ -149,7 +149,7 @@ export function EventForm({
                   value={field.state.value || ''}
                   onChange={(e) => field.handleChange(e.target.value)}
                   rows={3}
-                  className="resize-none"
+                  className="resize-none bg-indigo-50"
                 />
               </div>
             )}

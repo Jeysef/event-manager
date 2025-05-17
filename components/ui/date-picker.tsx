@@ -18,7 +18,7 @@ function DatePicker({ date, setDate }: DatePickerProps) {
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
-          className={cn("justify-start text-left font-normal px-3 py-1", !date && "text-muted-foreground")}
+          className={cn("justify-start text-left font-normal px-3 py-1 bg-indigo-50", !date && "text-muted-foreground")}
         >
           {date ? format(date, "EEE, dd MMM") : <span>Pick a date</span>}
         </Button>
