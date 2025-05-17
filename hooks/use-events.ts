@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { eventsApi } from "../api";
 import { useSearch } from "./use-search";
-import { startOfToday } from "date-fns";
+import { Event } from "@/lib/db";
 
 export function useEvents(params?: Parameters<typeof eventsApi.getEvents>[0]) {
   return useQuery({
@@ -40,14 +40,13 @@ export const deleteEventMutationFn = (id: string) => {
   return eventsApi.deleteEvent(id);
 };
 
-export function useSearchedEvents(params?: Parameters<typeof eventsApi.getEvents>[0]) {
+export function useSearchedEvents(params?: { startDate?: Event["from"], endDate?: Event["to"] }) {
   const { search, startDate, endDate } = useSearch();
 
 
   return useEvents({
     search: search || undefined,
-    startDate: startDate ?? undefined,
-    endDate: endDate ?? undefined,
-    ...params,
+    startDate: startDate ?? params?.startDate ?? undefined,
+    endDate: endDate ?? params?.endDate ?? undefined,
   });
 }
