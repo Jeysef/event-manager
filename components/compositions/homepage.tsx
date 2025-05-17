@@ -1,12 +1,14 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { endOfMonth, format, isSameDay, startOfMonth } from "date-fns"
+import { endOfMonth, format, isSameDay, isSameMonth, startOfMonth } from "date-fns"
 import { useEvents } from "@/hooks/use-events"
-import { Skeleton } from "@/components/ui/skeleton"
 import { EventCard } from "./event-card"
 import { Calendar } from "../ui/calendar"
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "../ui/card"
+import { Button, buttonVariants } from "../ui/button"
+import { EventCardSkeleton } from "./event-card-skeleton"
+import Link from "next/link"
 
 export default function Homepage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
@@ -70,6 +72,7 @@ export default function Homepage() {
                 selected={selectedDate}
                 onSelect={(date) => date && setSelectedDate(date)}
                 onMonthChange={setMonth}
+                month={month}
                 className="w-full h-full"
                 classNames={{
                   months: "flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:space-x-4 sm:space-x-0",
@@ -111,23 +114,37 @@ export default function Homepage() {
         </div>
         <div className="lg:col-span-1">
           <Card className="md:col-span-1 flex flex-col">
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-2 grid-flow-col">
               <CardTitle>Events for {format(selectedDate, "MMMM d, yyyy")}</CardTitle>
               <CardDescription>{selectedDayEvents.length} events scheduled</CardDescription>
+              <Button
+                variant="outline"
+                className="ml-auto col-span-2 row-span-full"
+                onClick={() => {
+                  setSelectedDate(new Date())
+                  setMonth(new Date())
+                }}
+                disabled={isSameDay(selectedDate, new Date())}
+              >
+                Today
+              </Button>
             </CardHeader>
             <CardContent className="flex-1 overflow-auto">
+              <div className="mb-4 flex justify-end">
+                <Link href="/event" className={buttonVariants()}>
+                  + Create New Event
+                </Link>
+              </div>
               <div className="space-y-4">
-                {/* Show prompt if selectedDate is not in the current month */}
-                {selectedDate.getMonth() !== month.getMonth() || selectedDate.getFullYear() !== month.getFullYear() ? (
+                {!isSameMonth(selectedDate, month) ? (
                   <p className="text-muted-foreground text-center py-8">
                     Please select a day in the current month to view events.
                   </p>
                 ) : isLoading ? (
                   Array.from({ length: 3 }).map((_, index) => (
                     <div key={index} className="space-y-2">
-                      <Skeleton className="h-5 w-1/2" />
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-3/4" />
+                      <EventCardSkeleton />
+                      <EventCardSkeleton />
                     </div>
                   ))
                 ) : selectedDayEvents.length > 0 ? (
