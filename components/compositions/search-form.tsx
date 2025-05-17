@@ -1,37 +1,99 @@
 'use client';
 
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { Label } from '../ui/label';
 import { SidebarInput } from '../ui/sidebar';
 import { useSearch } from '@/hooks/use-search';
 import { useRouter, usePathname } from 'next/navigation';
+import { Button } from '../ui/button';
+import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover';
+import { endOfDay, format, startOfDay } from 'date-fns';
+import { Calendar } from '../ui/calendar';
+import { DateRange } from '@/types/date-range';
+import { useMemo } from 'react';
+import { ButtonGroup } from '../ui/button-group';
 
 export function SearchForm({ ...props }: React.ComponentProps<"form">) {
   const router = useRouter();
   const pathname = usePathname();
-  const { search, setSearch } = useSearch();
+  const { search, setSearch, startDate, setStartDate, endDate, setEndDate } = useSearch();
+  const range = useMemo(() => ({ from: startDate ?? undefined, to: endDate ?? undefined }), [startDate, endDate]);
+
+  const redirectToEvents = () => {
+    if (pathname !== '/events') {
+      router.replace('/events');
+    }
+  };
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    if (pathname !== '/events') {
-      router.push('/events');
-    }
+    redirectToEvents();
     setSearch(e.target.value);
+  }
+
+  const handleDateRangeChange = (range: DateRange | undefined) => {
+    redirectToEvents();
+    if (range?.from) setStartDate(startOfDay(range.from));
+    if (range?.to) setEndDate(endOfDay(range.to));
+    if (!range) {
+      setStartDate(null);
+      setEndDate(null);
+    }
   }
 
   return (
     <form {...props} onSubmit={(e) => e.preventDefault()}>
-      <div className="relative">
-        <Label htmlFor="search" className="sr-only">
-          Search
-        </Label>
-        <SidebarInput
-          id="search"
-          placeholder="Type to search..."
-          className="h-8 pl-7"
-          defaultValue={search}
-          onChange={handleChange}
-        />
-        <Search className="pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2 select-none opacity-50" />
+      <div className="relative flex items-center">
+        <div className="flex-1">
+          <Label htmlFor="search" className="sr-only">
+            Search
+          </Label>
+          <SidebarInput
+            id="search"
+            placeholder="Type to search..."
+            className="h-8 pl-7 rounded-e-none"
+            defaultValue={search}
+            onChange={handleChange}
+          />
+          <Search className="pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2 select-none opacity-50" />
+        </div>
+        <Popover>
+          <ButtonGroup>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-8 min-w-[120px] px-2 rounded-s-none border-s-0"
+              >
+                {startDate && endDate
+                  ? `${format(startDate, 'MMM d, yyyy')} - ${format(endDate, 'MMM d, yyyy')}`
+                  : startDate
+                    ? format(startDate, 'MMM d, yyyy')
+                    : 'Pick date(s)'}
+              </Button>
+            </PopoverTrigger>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="h-8"
+              onClick={() => {
+                setSearch('');
+                handleDateRangeChange(undefined);
+              }}
+            >
+              <X className="" />
+            </Button>
+          </ButtonGroup>
+          <PopoverContent align="end" className="w-auto p-4">
+            <Calendar
+              mode="range"
+              numberOfMonths={2}
+              selected={range}
+              onSelect={handleDateRangeChange}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
       </div>
     </form>
   );
