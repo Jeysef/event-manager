@@ -7,6 +7,7 @@ export function useEvents(params?: Parameters<typeof eventsApi.getEvents>[0]) {
   return useQuery({
     queryKey: ["events", params],
     queryFn: () => eventsApi.getEvents(params),
+    staleTime: 1000, // 1 second
   });
 }
 
@@ -16,9 +17,13 @@ export function useEvent(id: string) {
     queryKey: ["event", id],
     queryFn: () => eventsApi.getEvent(id),
     initialData: () => {
-      // Try to get the event from the cached events list
-      const events = queryClient.getQueryData<any[]>(["events", {}]);
-      return events?.find((event) => String(event.id) === String(id));
+      // Search all cached "events" queries for the event
+      const queries = queryClient.getQueriesData<any[]>({ queryKey: ["events"] });
+      for (const [, events] of queries) {
+        const found = events?.find((event) => String(event.id) === String(id));
+        if (found) return found;
+      }
+      return undefined;
     },
   });
 }
