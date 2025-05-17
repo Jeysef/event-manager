@@ -1,17 +1,13 @@
 import React, { useState } from 'react'
-import { Button } from '../ui/button';
-import { Card, CardHeader, CardFooter, CardContent, CardTitle } from '../ui/card';
+import { Card, CardHeader, CardContent, CardTitle } from '../ui/card';
 import { useForm } from '@tanstack/react-form';
 import { format } from 'date-fns';
 import { deleteEventMutationFn, updateEventMutationFn, useEvent } from '@/hooks/use-events';
 import { EventDetailView } from './event-detail-view';
-import { Label } from '../ui/label';
-import { Input } from '../ui/input';
-import { Textarea } from '../ui/textarea';
-import { Spinner } from '../ui/spinner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Skeleton } from '../ui/skeleton';
 import { useRouter } from 'next/navigation';
+import { EventForm } from './event-form';
 
 function EventDetail({ eventId }: { eventId: string }) {
 
@@ -142,125 +138,28 @@ function EventDetail({ eventId }: { eventId: string }) {
             }}
           />
         ) : (
-          <EventDetailForm
-            isUpdating={isUpdating}
-            onCancel={() => setIsEditing(false)}
-            onSubmit={() => {
-              form.handleSubmit();
+          <EventForm
+            initialValues={{
+              name: event.name,
+              description: event.description,
+              from: event.from,
+              to: event.to,
             }}
+            isPending={isUpdating}
+            onCancel={() => setIsEditing(false)}
+            onSubmitAction={({ name, description, from, to }) => {
+              updateEvent({
+                id: `${event.id}`,
+                params: { name, description, from, to },
+              });
+            }}
+            submitLabel="Save Changes"
+            cancelLabel="Cancel"
           />
         )}
       </Card>
     </div>
   )
-
-  function EventDetailForm({ onCancel, onSubmit, isUpdating }: { onCancel: () => void, onSubmit: () => void, isUpdating: boolean }) {
-    return (
-      <>
-        <CardHeader>
-          <form.Field
-            name="name"
-            validators={{ onChange: value => !value ? "Event name is required" : undefined }}
-          >
-            {field => (
-              <div className="space-y-2">
-                <Label htmlFor="event-name">Event Name</Label>
-                <Input
-                  id="event-name"
-                  value={field.state.value}
-                  onChange={e => field.handleChange(e.target.value)}
-                />
-                {field.state.meta.errors && (
-                  <p className="text-sm text-red-500">{field.state.meta.errors.join(', ')}</p>
-                )}
-              </div>
-            )}
-          </form.Field>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <form.Field name="description">
-            {field => (
-              <div className="space-y-2">
-                <Label htmlFor="event-desc">Description</Label>
-                <Textarea
-                  id="event-desc"
-                  value={field.state.value || ''}
-                  onChange={e => field.handleChange(e.target.value)}
-                  rows={4}
-                />
-              </div>
-            )}
-          </form.Field>
-          <div className="grid grid-cols-2 gap-4">
-            <form.Field
-              name="from"
-              validators={{ onChange: value => !value ? "Start date is required" : undefined }}
-            >
-              {field => (
-                <div className="space-y-2">
-                  <Label htmlFor="event-from">From</Label>
-                  <Input
-                    id="event-from"
-                    type="datetime-local"
-                    value={field.state.value}
-                    onChange={e => field.handleChange(e.target.value)}
-                  />
-                  {field.state.meta.errors && (
-                    <p className="text-sm text-red-500">{field.state.meta.errors.join(', ')}</p>
-                  )}
-                </div>
-              )}
-            </form.Field>
-            <form.Field
-              name="to"
-              validators={{
-                onChange: value => !value ? "End date is required" : undefined,
-                onChangeAsync: async ({ value, fieldApi }) => {
-                  const fromValue = fieldApi.form.getFieldValue('from');
-                  if (fromValue && value && new Date(value) <= new Date(fromValue)) {
-                    return "End date must be after start date";
-                  }
-                  return undefined;
-                }
-              }}
-            >
-              {field => (
-                <div className="space-y-2">
-                  <Label htmlFor="event-to">To</Label>
-                  <Input
-                    id="event-to"
-                    type="datetime-local"
-                    value={field.state.value}
-                    onChange={e => field.handleChange(e.target.value)}
-                  />
-                  {field.state.meta.errors && (
-                    <p className="text-sm text-red-500">{field.state.meta.errors.join(', ')}</p>
-                  )}
-                </div>
-              )}
-            </form.Field>
-          </div>
-        </CardContent>
-        <CardFooter className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={onCancel} disabled={isUpdating}>
-            Cancel
-          </Button>
-          <form.Subscribe selector={state => state}>
-            {(state) => (
-              <Button
-                type="button"
-                disabled={!state.canSubmit || isUpdating || state.isSubmitting}
-                onClick={onSubmit}
-              >
-                {(isUpdating || state.isSubmitting) ? <Spinner className="mr-2" /> : null}
-                {isUpdating || state.isSubmitting ? 'Saving...' : 'Save Changes'}
-              </Button>
-            )}
-          </form.Subscribe>
-        </CardFooter>
-      </>
-    );
-  }
 }
 
 export default EventDetail
