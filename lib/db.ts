@@ -40,7 +40,7 @@ export async function getEvents(filters?: {
   startDate?: Date;
   endDate?: Date;
 }): Promise<Event[]> {
-  let query = db.select().from(events);
+  const query = db.select().from(events);
   const conditions: SQL[] = [];
 
   if (filters?.search) {

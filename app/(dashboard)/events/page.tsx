@@ -22,7 +22,7 @@ export default function EventsPage() {
 
 
 
-  const renderContent = (events: Event[] | undefined, isLoading: boolean, error: any) => {
+  const renderContent = (events: Event[] | undefined, isLoading: boolean, error: Error | null) => {
     if (isLoading) {
       return (
         <div className="flex justify-center items-center h-[50vh]">

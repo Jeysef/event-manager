@@ -1,13 +1,12 @@
 import React, { useState } from 'react'
 import { Card, CardHeader, CardContent, CardTitle } from '../ui/card';
-import { useForm } from '@tanstack/react-form';
-import { format } from 'date-fns';
 import { deleteEventMutationFn, updateEventMutationFn, useEvent } from '@/hooks/use-events';
 import { EventDetailView } from './event-detail-view';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Skeleton } from '../ui/skeleton';
 import { useRouter } from 'next/navigation';
 import { EventForm } from './event-form';
+import { Event } from '@/lib/db';
 
 function EventDetail({ eventId }: { eventId: string }) {
 
@@ -25,7 +24,7 @@ function EventDetail({ eventId }: { eventId: string }) {
       // Snapshot the previous value
       const previousEvent = queryClient.getQueryData(['event', id]);
       // Optimistically update to the new value
-      queryClient.setQueryData(['event', id], (old: any) => ({ ...old, ...params }));
+      queryClient.setQueryData(['event', id], (old: Event) => ({ ...old, ...params }));
       return { previousEvent };
     },
     // If the mutation fails,
@@ -36,7 +35,7 @@ function EventDetail({ eventId }: { eventId: string }) {
       }
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['todos'] }),
-    onSuccess: (_) => {
+    onSuccess: () => {
       setIsEditing(false);
     },
   });
@@ -45,7 +44,7 @@ function EventDetail({ eventId }: { eventId: string }) {
     onMutate: async (id: string) => {
       await queryClient.cancelQueries({ queryKey: ['events'] });
       const previousEvents = queryClient.getQueryData(['events']);
-      queryClient.setQueryData(['events'], (old: any) => Array.isArray(old) ? old.filter((e: any) => `${e.id}` !== id) : old);
+      queryClient.setQueryData(['events'], (old: Event[]) => Array.isArray(old) ? old.filter((e: Event) => `${e.id}` !== id) : old);
       return { previousEvents };
     },
     onError: (_err, _id, context) => {

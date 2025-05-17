@@ -10,6 +10,7 @@ import { Button, buttonVariants } from "../ui/button"
 import { EventCardSkeleton } from "./event-card-skeleton"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { Event } from "@/lib/db"
 
 export default function Homepage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
@@ -26,7 +27,7 @@ export default function Homepage() {
   })
 
   const datesWithEvents = useMemo(() => {
-    const map = new Map<string, any[]>()
+    const map = new Map<string, Event[]>()
     if (!events) return map
 
     let currentDay = startOfDay(monthStart)

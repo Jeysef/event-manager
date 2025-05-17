@@ -1,6 +1,7 @@
 "use client"
 import { EventForm } from '@/components/compositions/event-form';
 import { createEventMutationFn } from '@/hooks/use-events';
+import { Event } from '@/lib/db';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import React from 'react'
@@ -14,7 +15,7 @@ export default function EventFormCreate() {
     onMutate: async (newEvent) => {
       await queryClient.cancelQueries({ queryKey: ["events"] });
       const previousEvents = queryClient.getQueryData(["events"]);
-      queryClient.setQueryData(["events"], (old: any) => {
+      queryClient.setQueryData(["events"], (old: Event[]) => {
         if (Array.isArray(old)) {
           return [...old, newEvent];
         }
