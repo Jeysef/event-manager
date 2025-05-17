@@ -54,7 +54,7 @@ export async function getEvents(filters?: {
     conditions.push(lte(events.to, filters.endDate));
   }
 
-  return query.where(conditions.length > 0 ? and(...conditions) : undefined);
+  return query.where(conditions.length > 0 ? and(...conditions) : undefined).orderBy(events.from);
 }
 
 export async function getEvent(id: number) {
