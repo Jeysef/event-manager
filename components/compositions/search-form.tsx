@@ -9,9 +9,9 @@ import { Button } from '../ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { Calendar } from '../ui/calendar';
-import { DateRange } from '@/types/date-range';
 import { useMemo } from 'react';
 import { ButtonGroup } from '../ui/button-group';
+import { DateRange } from 'react-day-picker';
 
 export function SearchForm({ ...props }: React.ComponentProps<"form">) {
   const router = useRouter();
