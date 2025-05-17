@@ -22,18 +22,17 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
   return (
     <Link className='contents' href={`/event/${event.id}`}>
       <Card
-        className="mb-2 cursor-pointer hover:bg-slate-50 transition-colors py-2 relative flex-row items-center"
+        className="mb-2 hover:bg-slate-50 transition-colors py-2 relative flex-row items-center"
       >
         <div className='flex-col flex-1'>
-
-          <CardHeader>
-            <CardTitle>{event.name}</CardTitle>
-            {event.description ? <CardDescription>{event.description}</CardDescription> : null}
-          </CardHeader>
-          <CardContent>
-            <div className="text-sm text-muted-foreground">
+          <CardHeader className="p-4 pb-2">
+            <CardTitle className="text-lg">{event.name}</CardTitle>
+            <CardDescription className="flex items-center text-xs">
               {formatTimeRange()}
-            </div>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-4 pt-2">
+            <p className="text-sm text-muted-foreground">{event.description}</p>
           </CardContent>
         </div>
         <ChevronRight size={16} className="text-muted-foreground m-3" />

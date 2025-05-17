@@ -1,6 +1,6 @@
 "use client";
 
-import { EventCard } from "@/components/compositions/event-card";
+import { EventList } from "@/components/compositions/event-list";
 import { useSearchedEvents } from "@/hooks/use-events";
 
 export default function EventsPage() {
@@ -10,10 +10,8 @@ export default function EventsPage() {
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {events?.map((event) => (
-        <EventCard key={event.id} event={event} />
-      ))}
+    <div className="flex flex-col gap-4 p-4">
+      {events ? <EventList events={events} /> : <div>No events found</div>}
     </div>
   );
 }
