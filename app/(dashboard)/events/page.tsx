@@ -2,25 +2,13 @@
 
 import { EventList } from "@/components/compositions/event-list";
 import { useSearchedEvents } from "@/hooks/use-events";
-import { startOfToday } from "date-fns";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
 import { Event } from "@/lib/db";
-
-enum Tab {
-  UPCOMING = "UPCOMING",
-  PREVIOUS = "PREVIOUS",
-}
+import { startOfToday } from "date-fns";
 
 export default function EventsPage() {
-  const [activeTab, setActiveTab] = useState(Tab.UPCOMING);
-
   const { data: events, isLoading, error } = useSearchedEvents({
-    startDate: activeTab === Tab.UPCOMING ? startOfToday() : undefined,
-    endDate: activeTab === Tab.UPCOMING ? undefined : startOfToday(),
+    startDate: startOfToday(),
   });
-
-
 
   const renderContent = (events: Event[] | undefined, isLoading: boolean, error: Error | null) => {
     if (isLoading) {
@@ -45,19 +33,8 @@ export default function EventsPage() {
   return (
     <main className="min-h-screen bg-background">
       <div className="container mx-auto py-6">
-        <h1 className="text-2xl font-bold mb-6 text-center">Events</h1>
-        <Tabs defaultValue={Tab.UPCOMING} onValueChange={(value) => setActiveTab(value as Tab)}>
-          <TabsList className="grid w-full grid-cols-2 mb-6 max-w-3xl mx-auto">
-            <TabsTrigger value={Tab.UPCOMING}>Upcoming Events</TabsTrigger>
-            <TabsTrigger value={Tab.PREVIOUS}>Previous Events</TabsTrigger>
-          </TabsList>
-          <TabsContent value={Tab.UPCOMING}>
-            {renderContent(events, isLoading, error)}
-          </TabsContent>
-          <TabsContent value={Tab.PREVIOUS}>
-            {renderContent(events, isLoading, error)}
-          </TabsContent>
-        </Tabs>
+        <h1 className="text-2xl font-bold mb-6 text-center">Upcoming Events</h1>
+        {renderContent(events, isLoading, error)}
       </div>
     </main>
   );
