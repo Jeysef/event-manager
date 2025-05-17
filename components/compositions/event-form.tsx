@@ -28,6 +28,18 @@ export default function EventForm() {
   const [fromTime, setFromTime] = useState<string>(`${pad(now.getHours())}:00`)
   const [toTime, setToTime] = useState<string>(`${pad(now.getHours() + 1)}:00`)
 
+  const handleSetFromDate = (date: Date) => {
+    setFromDate(date)
+    if (date > toDate) {
+      setToDate(date)
+    }
+  }
+  const handleSetToDate = (date: Date) => {
+    setToDate(date)
+    if (date < fromDate) {
+      setFromDate(date)
+    }
+  }
   const from = useMemo(() => {
     const date = new Date(fromDate)
     const [hours, minutes] = fromTime.split(":").map(Number)
@@ -166,14 +178,14 @@ export default function EventForm() {
 
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <DatePicker date={fromDate} setDate={setFromDate} />
+              <DatePicker date={fromDate} setDate={handleSetFromDate} />
               <TimePicker value={fromTime} onChange={setFromTime} />
             </div>
 
             <div className="text-gray-400">→</div>
 
             <div className="space-y-1">
-              <DatePicker date={toDate} setDate={setToDate} />
+              <DatePicker date={toDate} setDate={handleSetToDate} />
               <TimePicker value={toTime} onChange={setToTime} />
             </div>
           </div>
