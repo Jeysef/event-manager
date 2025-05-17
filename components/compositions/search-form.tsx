@@ -2,7 +2,6 @@
 
 import { Search, X } from 'lucide-react';
 import { Label } from '../ui/label';
-import { SidebarInput } from '../ui/sidebar';
 import { useSearch } from '@/hooks/use-search';
 import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '../ui/button';
@@ -12,6 +11,7 @@ import { Calendar } from '../ui/calendar';
 import { useMemo } from 'react';
 import { ButtonGroup } from '../ui/button-group';
 import { DateRange } from 'react-day-picker';
+import { Input } from '../ui/input';
 
 export function SearchForm({ ...props }: React.ComponentProps<"form">) {
   const router = useRouter();
@@ -21,23 +21,21 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
 
   const redirectToEvents = () => {
     if (pathname !== '/events') {
-      router.replace('/events');
+        router.push('/events');
     }
   };
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    redirectToEvents();
-    setSearch(e.target.value);
+      setSearch(e.target.value);
   }
-
+  
   const handleDateRangeChange = (range: DateRange | undefined) => {
-    redirectToEvents();
-    if (range?.from) setStartDate(startOfDay(range.from));
-    if (range?.to) setEndDate(endOfDay(range.to));
-    if (!range) {
-      setStartDate(null);
-      setEndDate(null);
-    }
+      if (range?.from) setStartDate(startOfDay(range.from));
+      if (range?.to) setEndDate(endOfDay(range.to));
+      if (!range) {
+        setStartDate(null);
+        setEndDate(null);
+      }
   }
 
   return (
@@ -47,16 +45,17 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
           <Label htmlFor="search" className="sr-only">
             Search
           </Label>
-          <SidebarInput
+          <Input
             id="search"
             placeholder="Type to search..."
             className="h-8 pl-7 rounded-e-none"
-            defaultValue={search}
+            value={search}
+            onFocus={redirectToEvents}
             onChange={handleChange}
           />
           <Search className="pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2 select-none opacity-50" />
         </div>
-        <Popover>
+        <Popover onOpenChange={open => open && redirectToEvents()}>
           <ButtonGroup>
             <PopoverTrigger asChild>
               <Button
