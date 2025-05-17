@@ -1,6 +1,6 @@
 # Event manager
 
-An interview project by Lakmoos from 14.05.2025 - 18.05.2025
+An interview project by Lakmoos from 14.05.2025 - 17.05.2025
 
 ## Description
 
