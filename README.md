@@ -65,3 +65,17 @@ INSERT INTO events (name, description, "from", "to") VALUES
     '2025-06-28 20:00:00'
   );
 ```
+
+## To build for docker: 
+
+add the following to the `next.config.js` file:
+
+```js
+// next.config.js
+module.exports = {
+  // ... rest of the configuration.
+  output: "standalone",
+};
+```
+
+This will build the project as a standalone app inside the Docker image.
